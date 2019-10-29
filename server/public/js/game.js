@@ -13,13 +13,38 @@ var config = {
 const game = new Phaser.Game(config);
 
 function preload() {
-
+    this.load.image('player', 'assets/player.png');
 }
 
 function create() {
+    var self = this; // Referenciando Phaser Scene
     this.socket = io();
+    this.players = this.add.group();
+
+    // Lendo evento currentPlayer emitido pelo servidor
+    this.socket.on('currentPlayers', function (players) {
+        Object.keys(players).forEach(function (id) { // Cria um array de todos as chaves em players e loop
+            if (players[id].playerId === self.socket.id) { // Loop entre todos jogadores para checar se jogador esta incluso no grupo
+                displayPlayers(self, players[id], 'player');
+            }
+        })
+    })
 }
 
 function update() {
 
+}
+
+// Game functions
+function displayPlayers(self, playerInfo, sprite) {
+    const player = self.add.sprite(playerInfo.x, playerInfo.y, sprite)
+        .setOrigin(0.5, 0.5)
+        .setDisplaySize(53, 40);
+
+    // Checa time do jogador e tinge sprite
+    if (playerInfo.team === 'blue') player.setTint(0x0000ff);
+    else player.setTint(0xff0000);
+
+    player.playerId = playerInfo.playerId;
+    self.players.add(player); // Adiciona player ao grupo local de players
 }

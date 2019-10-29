@@ -21,7 +21,7 @@ const config = {
 const players = {};
 
 function preload() {
-    this.load.image('player', 'assets/playerBlue.png');
+    this.load.image('player', 'assets/player.png');
 }
 
 function create() {
@@ -89,7 +89,7 @@ function addPlayer(self, playerInfo) {
 function removePlayer(self, playerId) {
     self.players.getChildren().forEach((player) => {
         if (playerId === player.playerId) {
-            player.destroy();
+            player.destroy(); 
         }
     });
 }
