@@ -5,11 +5,11 @@ const server = require('http').Server(app); // Suplantando app para servidor htt
 app.use(express.static(__dirname + '/public')); // Usando função middleware static de express para renderizar arquivos estáticos
 
 // Diz ao servidor para 'servir' index.html como pagina root do server
-app.get('/', function () {
+app.get('/', function (req, res) {
     res.sendFile(__dirname + '/index.html'); 
 });
 
 // Server 'ouvindo' a port 8081
 server.listen(8081, function () {
-    console.log(`Listening on ${server.adress().port}`);
+    console.log(`Listening on ${server.address().port}`);
 });
