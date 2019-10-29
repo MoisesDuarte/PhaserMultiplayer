@@ -25,7 +25,13 @@ function preload() {
 }
 
 function create() {
-    
+    // 'Ouvindo' chamadas de conexões no servidor
+    io.on('connection', function (socket) {
+        console.log('Jogador conectou');
+        socket.on('disconnect', function() {
+            console.log('Jogador desconectou');
+        });
+    });
 }
 
 function update() {

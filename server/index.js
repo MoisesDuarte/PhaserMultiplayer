@@ -24,10 +24,10 @@ function setupAuthoritativePhaser() {
         pretendToBeVisual: true 
     }).then((dom) => { // Abrindo servidor para clientes após setup do mesmo
         dom.window.gameLoaded = () => { // Após Phaser ser carregado e inicializado
-            dom.window.io = io;
             server.listen(8081, function () {
                 console.log(`Listening on ${server.address().port}`);
             });
+            dom.window.io = io; // Injetando socket.io em jsdom
         }
     }).catch((error) => {
         console.log(error.message);
