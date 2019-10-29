@@ -14,6 +14,7 @@ const game = new Phaser.Game(config);
 
 function preload() {
     this.load.image('player', 'assets/player.png');
+    this.load.image('otherPlayer', 'assets/otherPlayer.png');
 }
 
 function create() {
@@ -26,9 +27,25 @@ function create() {
         Object.keys(players).forEach(function (id) { // Cria um array de todos as chaves em players e loop
             if (players[id].playerId === self.socket.id) { // Loop entre todos jogadores para checar se jogador esta incluso no grupo
                 displayPlayers(self, players[id], 'player');
+            } else {
+                displayPlayers(self, players[id], 'otherPlayer');
             }
-        })
-    })
+        });
+    });
+
+
+    this.socket.on('newPlayer', function(playerInfo) {
+        displayPlayers(self, playerInfo, 'otherPlayer');
+    });
+
+    // Apaga jogador do grupo ao desconectar do jogo
+    this.socket.on('disconnect', function (playerId) {
+        self.players.getChildren().forEach(function (player) {
+            if (playerId === player.playerId) {
+                player.destroy();
+            }
+        });
+    });
 }
 
 function update() {
