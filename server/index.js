@@ -4,6 +4,7 @@ const express = require('express'); // Referenciando módulo express para funç�
 
 const app = express(); // Criando instância em app
 const server = require('http').Server(app); // Suplantando app para servidor http, para gerenciamento de requests http (GET, POST, etc)
+const io = require('socket.io').listen(server); // Injetando socket.io em servidor para utilizar na comunicação cliente servidor
 const { JSDOM } = jsdom; // Criando instância de Jsdom
 
 app.use(express.static(__dirname + '/public')); // Usando função middleware static de express para renderizar arquivos estáticos
@@ -23,6 +24,7 @@ function setupAuthoritativePhaser() {
         pretendToBeVisual: true 
     }).then((dom) => { // Abrindo servidor para clientes após setup do mesmo
         dom.window.gameLoaded = () => { // Após Phaser ser carregado e inicializado
+            dom.window.io = io;
             server.listen(8081, function () {
                 console.log(`Listening on ${server.address().port}`);
             });
