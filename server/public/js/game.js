@@ -15,12 +15,17 @@ const game = new Phaser.Game(config);
 function preload() {
     this.load.image('player', 'assets/player.png');
     this.load.image('otherPlayer', 'assets/otherPlayer.png');
+    this.load.image('star', 'assets/star_gold.png');
 }
 
 function create() {
     var self = this; // Referenciando Phaser Scene
     this.socket = io(); // Referenciado socket.io
     this.players = this.add.group();
+
+    // Texto da pontuação
+    this.blueScoreText = this.add.text(16, 16, '', { fontSize: '32px', fill: '#0000FF' });
+    this.redScoreText = this.add.text(584, 16, '', { fontSize: '32px', fill: '#FF0000' });
 
     // Lendo evento currentPlayer emitido pelo servidor
     this.socket.on('currentPlayers', function (players) {
@@ -33,7 +38,7 @@ function create() {
         });
     });
 
-
+    // Apresenta novo jogador no servidor
     this.socket.on('newPlayer', function(playerInfo) {
         displayPlayers(self, playerInfo, 'otherPlayer');
     });
@@ -57,6 +62,22 @@ function create() {
                 }
             });
         });
+    });
+
+    // Atualiza pontuação
+    this.socket.on('updateScore', function (scores) {
+        self.blueScoreText.setText('Blue: ' + scores.blue);
+        self.redScoreText.setText('Red: ' + scores.red);
+    });
+
+    // Atualiza posição da estrela
+    this.socket.on('starLocation', function (starLocation) {
+        // Checa se estrela já existe
+        if (!self.star) { 
+            self.star = self.add.image(starLocation.x, starLocation.y, 'star');
+        } else {
+            self.star.setPosition(starLocation.x, starLocation.y);
+        }
     });
 
     // Lendo input do teclado
