@@ -46,10 +46,52 @@ function create() {
             }
         });
     });
+
+    // Atualiza as coordenadas do jogador com movimento feito no servidor
+    this.socket.on('playerUpdates', function (players) {
+        Object.keys(players).forEach(function (id) { // loop pelo objeto players mandado pelo servidor
+            self.players.getChildren().forEach(function (player) { // loop pelo objeto players local
+                if (players[id].playerId === player.playerId) {
+                    player.setRotation(players[id].rotation);
+                    player.setPosition(players[id].x, players[id].y);
+                }
+            });
+        });
+    });
+
+    // Lendo input do teclado
+    this.cursors = this.input.keyboard.createCursorKeys();
+    this.leftKeyPressed = false;
+    this.rightKeyPressed = false;
+    this.upKeyPressed = false;
 }
 
 function update() {
+    const left = this.leftKeyPressed;
+    const right = this.rightKeyPressed;
+    const up = this.upKeyPressed;
 
+    // Rotação
+    if (this.cursors.left.isDown) {
+        this.leftKeyPressed = true;
+    } else if (this.cursors.right.isDown) {
+        this.rightKeyPressed = true;
+    } else {
+        this.leftKeyPressed = false;
+        this.rightKeyPressed = false;
+    }
+
+    // Aceleração
+    if (this.cursors.up.isDown) {
+        this.upKeyPressed = true;
+    } else {
+        this.upKeyPressed = false;
+    }
+
+    // Enviando input para servidor
+    if (left !== this.leftKeyPressed || right !== this.rightKeyPressed || up !== this.upKeyPressed) {
+        this.socket.emit('playerInput', { left: this.leftKeyPressed, right: this.rightKeyPressed, up: this.upKeyPressed });
+    }
 }
 
 // Game functions
