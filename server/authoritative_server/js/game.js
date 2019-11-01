@@ -22,11 +22,31 @@ const players = {};
 
 function preload() {
     this.load.image('player', 'assets/player.png');
+    this.load.image('star', 'assets/star_gold.png');
 }
 
 function create() {
     var self = this; // Variavel guarda uma referencia ao Phaser Scene
+    
     this.players = this.physics.add.group();
+    this.scores = { blue: 0, red: 0 };
+
+    // Coletaveis e incrementação de pontuação
+    this.star = this.physics.add.image(randomPosition(700), randomPosition(500), 'star');
+    this.physics.add.collider(this.players);
+
+    this.physics.add.overlap(this.players, this.star, function(star, player) {
+        if (players[player.playerId].team === 'red') {
+            self.scores.red += 10;
+        } else {
+            self.scores.blue += 10;
+        }
+
+        self.star.setPosition(randomPosition(700), randomPosition(500));
+        io.emit('updateScore', self.scores);
+        io.emit('starLocation', { x: self.star.x, y: self.star.y });
+    });
+
 
     // 'Ouvindo' chamadas de conexões no servidor
     io.on('connection', function (socket) {
@@ -54,6 +74,12 @@ function create() {
 
         // Atualiza todos os outros jogadores quanto ao novo jogador (server -> client) (broadcast envia para todos os sockets/jogadores)
         socket.broadcast.emit('newPlayer', players[socket.id]);
+
+        // Envia o objeto star para o novo jogador
+        socket.emit('starLocation', { x: self.star.x, y: self.star.y });
+
+        // Envia a pontuação atual
+        socket.emit('updateScore', self.scores);
 
         socket.on('disconnect', function() {
             console.log('Jogador desconectou');
@@ -134,6 +160,11 @@ function handlePlayerInput(self, playerId, input) {
             players[player.playerId].input = input; // Guarda o input do jogador
         }
     });
+}
+
+// Randomiza posição
+function randomPosition(max) {
+    return Math.floor(Math.random() * max) + 50;
 }
 
 const game = new Phaser.Game(config);

@@ -19,7 +19,7 @@ function preload() {
 
 function create() {
     var self = this; // Referenciando Phaser Scene
-    this.socket = io();
+    this.socket = io(); // Referenciado socket.io
     this.players = this.add.group();
 
     // Lendo evento currentPlayer emitido pelo servidor
