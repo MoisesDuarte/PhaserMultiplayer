@@ -13,6 +13,7 @@ var config = {
 const game = new Phaser.Game(config);
 
 function preload() {
+    this.load.image('scoreboard', 'assets/scoreboard.png');
     this.load.image('player', 'assets/player.png');
     this.load.image('otherPlayer', 'assets/otherPlayer.png');
     this.load.image('star', 'assets/star_gold.png');
@@ -23,9 +24,12 @@ function create() {
     this.socket = io(); // Referenciado socket.io
     this.players = this.add.group();
 
+    const scoreboard = this.add.image(7, 7, 'scoreboard')
+                        .setOrigin(0, 0);
+
     // Texto da pontuação
-    this.blueScoreText = this.add.text(16, 16, '', { fontSize: '32px', fill: '#0000FF' });
-    this.redScoreText = this.add.text(584, 16, '', { fontSize: '32px', fill: '#FF0000' });
+    this.blueScoreText = this.add.text(161, 3, '', { fontFamily: 'monogram', fontSize: '32px', fill: '#e1ad56' });
+    this.redScoreText = this.add.text(161, 31, '', { fontFamily: 'monogram', fontSize: '32px', fill: '#e1ad56' });
 
     // Lendo evento currentPlayer emitido pelo servidor
     this.socket.on('currentPlayers', function (players) {
@@ -66,8 +70,8 @@ function create() {
 
     // Atualiza pontuação
     this.socket.on('updateScore', function (scores) {
-        self.blueScoreText.setText('Blue: ' + scores.blue);
-        self.redScoreText.setText('Red: ' + scores.red);
+        self.blueScoreText.setText(scores.blue);
+        self.redScoreText.setText(scores.red);
     });
 
     // Atualiza posição da estrela
